@@ -1,0 +1,29 @@
+symbol,delist_date,note
+# delist_date trống: không rõ ngày -> chỉ dựa vào ngày dữ liệu kết thúc. Mã còn giá sau khi rời HOSE (chuyển UPCoM) cần có ngày.
+FLC,,Tập đoàn FLC - vi phạm công bố thông tin
+ROS,,Xây dựng FLC Faros - vi phạm công bố thông tin
+AMD,,FLC Stone
+HAI,2023-04-18,Nông dược HAI - vi phạm công bố thông tin
+THI,2023-04-17,Thiết bị điện - không đủ tỷ lệ cổ đông nhỏ
+MCG,2023-05-12,Lỗ 3 năm liên tiếp
+UDC,2023-05-12,Lỗ 3 năm liên tiếp
+FTM,2022-05-16,Lỗ 3 năm liên tiếp (ước lượng từ khoảng trống dữ liệu)
+RIC,2022-05-16,Lỗ 3 năm liên tiếp (ước lượng từ khoảng trống dữ liệu)
+HOT,,Lỗ 3 năm liên tiếp
+HU3,,Kiểm toán ngoại trừ 3 năm liên tiếp
+SII,,Lỗ 3 năm liên tiếp
+PXS,2022-06-24,Kiểm toán ngoại trừ 3 năm liên tiếp (ước lượng từ khoảng trống dữ liệu)
+LCM,2022-08-29,Kiểm toán ngoại trừ 3 năm liên tiếp (ước lượng từ khoảng trống dữ liệu)
+APC,2024-04-29,Chiếu xạ An Phú
+SCD,2024-05-06,Nước giải khát Chương Dương
+QBS,2024-05-10,XNK Quảng Bình
+POM,2024-05-10,Thép Pomina
+DAG,2024-10-22,Nhựa Đông Á
+HBC,2024-09-06,Xây dựng Hòa Bình - lỗ lũy kế vượt vốn điều lệ
+HNG,2024-09-06,HAGL Agrico - lỗ 3 năm liên tiếp
+DZM,,
+MIM,,
+ITA,2025-02-04,Tân Tạo
+PSH,,Dầu khí Nam Sông Hậu - vi phạm công bố thông tin
+BCG,2026-07-15,Bamboo Capital - chậm nộp BCTC
+TCD,2026-07-15,Tracodi - chậm nộp BCTC

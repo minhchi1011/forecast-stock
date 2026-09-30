@@ -1,0 +1,111 @@
+# Cấu hình mặc định cho pipeline thử nghiệm.
+# Chạy với file khác: forecast-stock --config configs/<ten>.toml <lệnh>
+
+[paths]
+data_dir = "data"               # raw/ (cache giá), features.parquet, equity_curves.csv
+
+[data]
+# Sàn (HOSE/HNX/UPCOM) -> toàn bộ mã đang niêm yết; hoặc nhóm chỉ số (VN30, VN100...).
+# Dùng sàn + delisted_file để tránh survivorship bias; nhóm chỉ số chỉ là danh sách HIỆN TẠI.
+universe = "HOSE"
+delisted_file = "configs/delisted.csv"  # mã đã hủy niêm yết, tải thêm và cắt theo delist_date
+index = "VNINDEX"               # chỉ số tham chiếu (benchmark + trừ ra trong target)
+start = "2018-10-01"            # gói cộng đồng vnstock giới hạn 8 năm dữ liệu ngày
+price_unit = 1000               # vnstock trả giá theo nghìn đồng
+max_rows = 5000                 # tham số count của ohlcv, chỉ cần đủ lớn
+
+[data.fetch]
+requests_per_symbol = 2         # đo thực tế: mỗi mã tốn ~2 request
+safety_margin = 1.1             # nghỉ dư 10% so với giới hạn
+retries = 3
+retry_wait_seconds = 60         # chờ khi chạm rate limit, nhân theo số lần thử
+
+# Giới hạn request/phút của vnstock; dùng "api_key" khi có biến môi trường VNSTOCK_API_KEY (.env)
+[data.fetch.requests_per_minute]
+guest = 20
+api_key = 60
+
+[market]
+price_limit = 0.07              # biên độ HOSE
+limit_tolerance = 0.005         # coi là trần/sàn nếu cách giới hạn < 0.5% (làm tròn bước giá)
+# Mã đang giữ mà ngừng giao dịch quá N phiên (đình chỉ/hủy niêm yết không còn giá)
+# -> xóa sổ khỏi danh mục, chỉ thu hồi (1 - haircut) giá trị.
+writeoff_after_halted_sessions = 20
+writeoff_haircut = 0.5
+
+[costs]
+buy_fee = 0.0015
+sell_fee = 0.0015
+sell_tax = 0.001
+
+[features]
+momentum_windows = [20, 60, 120]
+momentum_skip = 5               # bỏ N phiên gần nhất khỏi momentum (tránh đảo chiều ngắn hạn)
+reversal_window = 5
+volatility_windows = [20, 60]
+ma_window = 50
+volume_short = 5
+volume_long = 60
+
+[universe_filter]
+adv_window = 20                 # số phiên tính giá trị giao dịch trung bình
+min_traded_value = 10e9         # đồng / phiên
+
+[target]
+horizon = 20                    # số phiên của biến mục tiêu (khớp cân bằng ~4 tuần)
+
+[model]
+min_train_years = 2             # dữ liệu tối thiểu trước khi bắt đầu dự báo ngoài mẫu
+retrain_months = 6              # huấn luyện lại mỗi N tháng (cửa sổ train mở rộng dần)
+embargo_sessions = 20           # bỏ N phiên cuối trước kỳ test (>= horizon) để target không chồng lấn
+num_boost_round = 300
+seed = 42
+
+[model.params]                  # tham số LightGBM (lgb.train)
+objective = "regression"
+learning_rate = 0.03
+num_leaves = 15
+min_data_in_leaf = 500
+feature_fraction = 0.8
+bagging_fraction = 0.8
+bagging_freq = 1
+lambda_l2 = 1.0
+verbose = -1
+
+[backtest]
+top_k = 10                      # số mã nắm giữ
+hold_rank = 20                  # vùng đệm: chỉ bán khi mã rơi khỏi top hold_rank (>= top_k)
+rebalance_weeks = 4             # cân bằng lại mỗi N tuần (khớp target.horizon = 20 phiên)
+min_ic_names = 20               # số mã tối thiểu để tính IC trong một tuần
+
+# `forecast-stock sweep`: chạy mọi tổ hợp tham số dưới đây cho các baseline được chọn
+[sweep]
+baselines = ["Biến động thấp 20", "Momentum 60"]
+rebalance_weeks = [1, 2, 4]
+hold_rank = [10, 20, 30]
+
+# Chiến lược baseline không dùng ML: điểm = sign * feature, điểm cao hơn được ưu tiên mua.
+[[baselines]]
+name = "Momentum 20"
+feature = "mom_20"
+sign = 1
+
+[[baselines]]
+name = "Momentum 60"
+feature = "mom_60"
+sign = 1
+
+[[baselines]]
+name = "Momentum 120"
+feature = "mom_120"
+sign = 1
+
+[[baselines]]
+name = "Đảo chiều 5 phiên"
+feature = "ret_5"
+sign = -1
+
+[[baselines]]
+name = "Biến động thấp 20"
+feature = "vol_20"
+sign = -1

@@ -1,0 +1,38 @@
+[project]
+name = "forecast-stock"
+version = "0.1.0"
+description = "Thử nghiệm model xếp hạng cổ phiếu Việt Nam (VN100)"
+readme = "README.md"
+authors = [
+    { name = "Hoang Minh Chi", email = "155606014+minhchi1011@users.noreply.github.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "lightgbm>=4.7.0",
+    "pandas>=2.3.3",
+    "pyarrow>=25.0.1",
+    "python-dotenv>=1.2.3",
+    "vnai>=2.6.2",
+    "vnstock>=4.0.9",
+]
+
+[project.scripts]
+forecast-stock = "forecast_stock.cli:main"
+
+[[tool.uv.index]]
+name = "vnstocks"
+url = "https://vnstocks.com/api/simple"
+explicit = true
+
+[tool.uv.sources]
+vnstock = { index = "vnstocks" }
+vnai = { index = "vnstocks" }
+
+[build-system]
+requires = ["uv_build>=0.12.21,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
